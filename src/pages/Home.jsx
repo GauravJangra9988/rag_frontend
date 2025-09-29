@@ -11,6 +11,26 @@ export const Home = () => {
   const [answer, setAnswer] = useState("");
 
 
+  const handleDelete = async() =>{
+    const deleteResponse = await fetch("http://localhost:8000/deleteSession", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    const data = await deleteResponse.json()
+    console.log(data)
+  }
+
+  const tryItHandler = async() =>{
+    setShowInput(true);
+
+    const historyAvailable = await fetch("http://localhost:8000/getSessionId",{
+      method: "GET",
+      credentials: 'include'
+    });
+    const data = await historyAvailable.json();
+    console.log(data.message)
+  }
 
   const handleFileUpload = () => {
     const el = document.createElement("input");
@@ -30,6 +50,7 @@ export const Home = () => {
         console.log("file uploading");
         const res = await fetch("http://localhost:8000/upload/file", {
           method: "POST",
+          credentials:'include',
           body: formData,
         });
 
@@ -51,7 +72,6 @@ export const Home = () => {
     }
 
     const sendQuery = {
-      user: "testuser1",
       query: message
     }
 
@@ -61,6 +81,7 @@ export const Home = () => {
         headers: {
           'Content-Type': "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify(sendQuery),
       });
       console.log("chat send");
@@ -86,9 +107,13 @@ export const Home = () => {
   return (
     <div
       className={`min-h-screen bg-bg font-serif flex flex-col items-center px-4 ${
-        showInput ? "justify-between py-20" : "justify-center"
+        showInput ? "relative justify-between py-20" : "justify-center"
       }`}
     >
+      <div className={`text-primary cursor-pointer absolute top-20 right-15 font-serif font-bold ${showInput ? "block" : "hidden"}`}
+      onClick={() => handleDelete()} >
+        Remove History
+      </div>
       <div className={showInput ? "hidden" : "block"}>
         <h1 className="font-semibold text-primary font-serif text-8xl text-center">
           Chat with .doc
@@ -117,7 +142,7 @@ export const Home = () => {
             variants={variants}
             transition={{ duration: 0.3 }}
             className="bg-primary text-2xl text-secondary px-5 py-2 rounded-2xl mt-8 cursor-pointer"
-            onClick={() => setShowInput(true)}
+            onClick={() => tryItHandler()}
           >
             Try it
           </motion.div>
