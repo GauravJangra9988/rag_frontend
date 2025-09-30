@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Forward, Paperclip } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion"; 
+import toast from "react-hot-toast";
 
 
 export const Home = () => {
@@ -12,62 +13,100 @@ export const Home = () => {
 
 
   const handleDelete = async() =>{
-    const deleteResponse = await fetch("http://localhost:8000/deleteSession", {
-      method: "POST",
-      credentials: "include",
-    });
+    
+    try {
+      const deleteResponse = await fetch(
+        "http://localhost:8000/deleteSession",
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
 
-    const data = await deleteResponse.json()
-    console.log(data)
+      const data = await deleteResponse.json();
+
+      if(!deleteResponse.ok){
+        throw new Error(data.message)
+      }
+
+      toast.success(data.message);
+
+    } catch(error){
+      toast.error(error.message)
+    }
+    
   }
 
   const tryItHandler = async() =>{
     setShowInput(true);
 
-    const historyAvailable = await fetch("http://localhost:8000/getSessionId",{
-      method: "GET",
-      credentials: 'include'
-    });
-    const data = await historyAvailable.json();
-    console.log(data.message)
+    try {
+        const historyAvailable = await fetch(
+          "http://localhost:8000/getSessionId",
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        const data = await historyAvailable.json();
+
+        if(!historyAvailable.ok){
+          throw new Error();
+        }
+        toast.success(data.message);
+    } catch(error){
+      toast.error(error.message)
+    }
+
   }
 
+
+
   const handleFileUpload = () => {
-    const el = document.createElement("input");
-    el.setAttribute("type", "file");
-    el.setAttribute("accept", ".pdf", ".doc", ".txt");
-    el.setAttribute("multiple", "multiple");
+    
+    try {
+          const el = document.createElement("input");
+          el.setAttribute("type", "file");
+          el.setAttribute("accept", ".pdf", ".doc", ".txt");
+          el.setAttribute("multiple", "multiple");
 
-    el.addEventListener("change", async (ev) => {
-      if (el.files && el.files.length > 0) {
-        const formData = new FormData();
-        Array.from(el.files).forEach((file, index) => {
-          formData.append("files", file);
-        });
+          el.addEventListener("change", async (ev) => {
+            if (el.files && el.files.length > 0) {
+              const formData = new FormData();
+              Array.from(el.files).forEach((file, index) => {
+                formData.append("files", file);
+              });
 
-        formData.append("user", "testuser1")
+              formData.append("user", "testuser1");
 
-        console.log("file uploading");
-        const res = await fetch("http://localhost:8000/upload/file", {
-          method: "POST",
-          credentials:'include',
-          body: formData,
-        });
+              console.log("file uploading");
+              const res = await fetch("http://localhost:8000/upload/file", {
+                method: "POST",
+                credentials: "include",
+                body: formData,
+              });
 
-        console.log(res.body)
-      }
-    });
+              const data = await res.json();
+              if(!res.ok){
+                throw new Error(data.message)
+              }
+              toast.success(data.message);
+            }
+          });
 
-    el.click();
+          el.click();
 
-    console.log("file upload");
+    } catch(error){
+      toast.error(error.message)
+    }
+
   };
 
 
   const handleChat = async() => {
     
     if(message === ""){
-      console.log("Write some query, cant send empty text")
+      toast.error("Write some query, cant send empty text");
       return;
     }
 
@@ -84,14 +123,17 @@ export const Home = () => {
         credentials: 'include',
         body: JSON.stringify(sendQuery),
       });
-      console.log("chat send");
+      toast.success("Chat send");
       const data = await res.json();
+
+      if(!res.ok){
+        throw new Error(data.message);
+      }
       
       setAnswer(data.answer)
-      console.log(data.answer);
       
     } catch(error){
-      console.log(error.message)
+      toast.error(error.message)
     }
 
   };
@@ -129,7 +171,7 @@ export const Home = () => {
         }`}
       >
         <h1 className="font-semibold text-4xl mb-16">Your Result</h1>
-        <p className="text-left font-normal">{answer}</p>
+        <p className="text-left tracking-wider font-extralight">{answer}</p>
       </div>
 
       <AnimatePresence mode="wait">
