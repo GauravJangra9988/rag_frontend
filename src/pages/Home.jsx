@@ -6,6 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
 
+
+const backend_url = import.meta.env.VITE_BACKEND_URL;
+
+
 export const Home = () => {
   const [showInput, setShowInput] = useState(false);
   const [message, setMessage] = useState("");
@@ -16,7 +20,7 @@ export const Home = () => {
     
     try {
       const deleteResponse = await fetch(
-        "http://localhost:8000/deleteSession",
+        `${backend_url}/deleteSession`,
         {
           method: "POST",
           credentials: "include",
@@ -42,7 +46,7 @@ export const Home = () => {
 
     try {
         const historyAvailable = await fetch(
-          "http://localhost:8000/getSessionId",
+          `${backend_url}/getSessionId`,
           {
             method: "GET",
             credentials: "include",
@@ -80,7 +84,7 @@ export const Home = () => {
               formData.append("user", "testuser1");
 
               console.log("file uploading");
-              const res = await fetch("http://localhost:8000/upload/file", {
+              const res = await fetch(`${backend_url}/upload/file`, {
                 method: "POST",
                 credentials: "include",
                 body: formData,
@@ -115,7 +119,7 @@ export const Home = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:8000/chat", {
+      const res = await fetch(`${backend_url}/chat`, {
         method: "POST",
         headers: {
           'Content-Type': "application/json",
