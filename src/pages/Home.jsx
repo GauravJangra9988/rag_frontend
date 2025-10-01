@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Forward, Paperclip } from "lucide-react";
+import { Forward, Paperclip, Sun } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion"; 
 import toast from "react-hot-toast";
 
@@ -15,6 +15,16 @@ export const Home = () => {
   const [message, setMessage] = useState("");
   const [answer, setAnswer] = useState("");
 
+
+  const handleThemeChange = () =>{
+    
+    const htmlElement = document.documentElement;
+    const theme = htmlElement.getAttribute("data-theme");
+
+    const setTheme = theme === "light" ?  "" : "light"
+    
+    htmlElement.setAttribute('data-theme', setTheme)
+  }
 
   const handleDelete = async() =>{
     
@@ -156,6 +166,11 @@ export const Home = () => {
         showInput ? "relative justify-between py-20" : "justify-center"
       }`}
     >
+    <div className="absolute top-10 right-15"
+          onClick={handleThemeChange}
+    >
+      <Sun className="text-primary"/>
+    </div>
       <div className={`text-primary cursor-pointer absolute top-20 right-15 font-serif font-bold ${showInput ? "block" : "hidden"}`}
       onClick={() => handleDelete()} >
         Remove History
