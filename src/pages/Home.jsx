@@ -2,161 +2,133 @@
 
 import React, { useState } from "react";
 import { Forward, Paperclip, Sun } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion"; 
+import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
-
-
 const backend_url = import.meta.env.VITE_BACKEND_URL;
-
-
-
 
 export const Home = () => {
   const [showInput, setShowInput] = useState(false);
   const [message, setMessage] = useState("");
   const [answer, setAnswer] = useState("");
 
-
-  const handleThemeChange = () =>{
-    
+  const handleThemeChange = () => {
     const htmlElement = document.documentElement;
     const theme = htmlElement.getAttribute("data-theme");
 
-    const setTheme = theme === "light" ?  "" : "light"
-    
-    htmlElement.setAttribute('data-theme', setTheme)
-  }
+    const setTheme = theme === "light" ? "" : "light";
 
-  const handleDelete = async() =>{
-    
+    htmlElement.setAttribute("data-theme", setTheme);
+  };
+
+  const handleDelete = async () => {
     try {
-      const deleteResponse = await fetch(
-        `${backend_url}/deleteSession`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+      const deleteResponse = await fetch(`${backend_url}/deleteSession`, {
+        method: "POST",
+        credentials: "include",
+      });
 
       const data = await deleteResponse.json();
 
-      if(!deleteResponse.ok){
-        throw new Error(data.message)
+      if (!deleteResponse.ok) {
+        throw new Error(data.message);
       }
 
       toast.success(data.message);
-
-    } catch(error){
-      toast.error(error.message)
+    } catch (error) {
+      toast.error(error.message);
     }
-    
-  }
+  };
 
-  const tryItHandler = async() =>{
+  const tryItHandler = async () => {
     setShowInput(true);
 
     try {
-        const historyAvailable = await fetch(
-          `${backend_url}/getSessionId`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        const data = await historyAvailable.json();
+      const historyAvailable = await fetch(`${backend_url}/getSessionId`, {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await historyAvailable.json();
 
-        if(!historyAvailable.ok){
-          throw new Error();
-        }
-        toast.success(data.message);
-    } catch(error){
-      toast.error(error.message)
+      if (!historyAvailable.ok) {
+        throw new Error();
+      }
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(error.message);
     }
-
-  }
-
-
-
-  const handleFileUpload = () => {
-    
-    try {
-          const el = document.createElement("input");
-          el.setAttribute("type", "file");
-          el.setAttribute("accept", ".pdf", ".doc", ".txt");
-          el.setAttribute("multiple", "multiple");
-
-          el.addEventListener("change", async (ev) => {
-            if (el.files && el.files.length > 0) {
-              const formData = new FormData();
-              Array.from(el.files).forEach((file, index) => {
-                formData.append("files", file);
-              });
-
-              formData.append("user", "testuser1");
-
-              console.log("file uploading");
-              const res = await fetch(`${backend_url}/upload/file`, {
-                method: "POST",
-                credentials: "include",
-                body: formData,
-              });
-
-              const data = await res.json();
-              if(!res.ok){
-                throw new Error(data.message)
-              }
-              toast.success(data.message);
-            }
-          });
-
-          el.click();
-
-    } catch(error){
-      toast.error(error.message)
-    }
-
   };
 
+  const handleFileUpload = () => {
+    try {
+      const el = document.createElement("input");
+      el.setAttribute("type", "file");
+      el.setAttribute("accept", ".pdf", ".doc", ".txt");
+      el.setAttribute("multiple", "multiple");
 
-  const handleChat = async() => {
-    
-    if(message === ""){
+      el.addEventListener("change", async (ev) => {
+        if (el.files && el.files.length > 0) {
+          const formData = new FormData();
+          Array.from(el.files).forEach((file, index) => {
+            formData.append("files", file);
+          });
+
+          formData.append("user", "testuser1");
+
+          console.log("file uploading");
+          const res = await fetch(`${backend_url}/upload/file`, {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.message);
+          }
+          toast.success(data.message);
+        }
+      });
+
+      el.click();
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleChat = async () => {
+    if (message === "") {
       toast.error("Write some query, cant send empty text");
       return;
     }
 
     const sendQuery = {
-      query: message
-    }
+      query: message,
+    };
 
-    document.getElementById("chatArea").value = ""
+    document.getElementById("chatArea").value = "";
 
     try {
       const res = await fetch(`${backend_url}/chat`, {
         method: "POST",
         headers: {
-          'Content-Type': "application/json",
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify(sendQuery),
       });
       toast.success("Chat send");
       const data = await res.json();
 
-      if(!res.ok){
+      if (!res.ok) {
         throw new Error(data.message);
       }
-      
-      setAnswer(data.answer)
-      
-    } catch(error){
-      toast.error(error.message)
+
+      setAnswer(data.answer);
+    } catch (error) {
+      toast.error(error.message);
     }
-
   };
-
-
 
   const variants = {
     hidden: { opacity: 0, y: 20, scale: 0.95 },
@@ -166,7 +138,9 @@ export const Home = () => {
 
   return (
     <div
-      className={`min-h-screen bg-bg font-serif flex flex-col items-center px-4 ${
+      className={`${
+        showInput ? "h-screen overflow-hidden" : "min-h-screen"
+      } bg-bg font-serif flex flex-col items-center px-4 ${
         showInput ? "relative justify-between py-20" : "justify-center"
       }`}
     >
@@ -195,8 +169,10 @@ export const Home = () => {
           showInput ? "block" : "hidden"
         }`}
       >
-        <h1 className="font-semibold text-4xl mb-16">Your Result</h1>
-        <p className="text-left overflow-hidden h-60tracking-wider font-extralight">{answer}</p>
+        <h1 className="font-semibold text-4xl mb-12">Your Result</h1>
+        <p className="text-left overflow-y-auto min-h-60 max-h-60 tracking-wider font-extralight">
+          {answer}
+        </p>
       </div>
 
       <AnimatePresence mode="wait">
@@ -224,7 +200,7 @@ export const Home = () => {
             className="relative border rounded-3xl mx-auto min-w-2xl min-h-48 border-primary mt-8 w-full max-w-2xl"
           >
             <textarea
-            id="chatArea"
+              id="chatArea"
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   event.preventDefault();
