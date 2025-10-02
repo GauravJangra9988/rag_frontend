@@ -170,7 +170,7 @@ export const Home = () => {
         }`}
       >
         <h1 className="font-semibold text-4xl mb-12">Your Result</h1>
-        <p className="text-left overflow-y-auto min-h-60 max-h-60 tracking-wider font-extralight">
+        <p className="text-left overflow-y-auto min-h-60 max-h-60 custom-scrollbar tracking-wider font-extralight">
           {answer}
         </p>
       </div>
