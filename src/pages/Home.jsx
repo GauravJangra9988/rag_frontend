@@ -10,6 +10,8 @@ import toast from "react-hot-toast";
 const backend_url = import.meta.env.VITE_BACKEND_URL;
 
 
+
+
 export const Home = () => {
   const [showInput, setShowInput] = useState(false);
   const [message, setMessage] = useState("");
@@ -128,6 +130,8 @@ export const Home = () => {
       query: message
     }
 
+    document.getElementById("chatArea").value = ""
+
     try {
       const res = await fetch(`${backend_url}/chat`, {
         method: "POST",
@@ -166,13 +170,15 @@ export const Home = () => {
         showInput ? "relative justify-between py-20" : "justify-center"
       }`}
     >
-    <div className="absolute top-10 right-15"
-          onClick={handleThemeChange}
-    >
-      <Sun className="text-primary"/>
-    </div>
-      <div className={`text-primary cursor-pointer absolute top-20 right-15 font-serif font-bold ${showInput ? "block" : "hidden"}`}
-      onClick={() => handleDelete()} >
+      <div className="absolute top-10 right-15" onClick={handleThemeChange}>
+        <Sun className="text-primary" />
+      </div>
+      <div
+        className={`text-primary cursor-pointer absolute top-20 right-15 font-serif font-bold ${
+          showInput ? "block" : "hidden"
+        }`}
+        onClick={() => handleDelete()}
+      >
         Remove History
       </div>
       <div className={showInput ? "hidden" : "block"}>
@@ -190,7 +196,7 @@ export const Home = () => {
         }`}
       >
         <h1 className="font-semibold text-4xl mb-16">Your Result</h1>
-        <p className="text-left tracking-wider font-extralight">{answer}</p>
+        <p className="text-left overflow-hidden h-60tracking-wider font-extralight">{answer}</p>
       </div>
 
       <AnimatePresence mode="wait">
@@ -218,6 +224,13 @@ export const Home = () => {
             className="relative border rounded-3xl mx-auto min-w-2xl min-h-48 border-primary mt-8 w-full max-w-2xl"
           >
             <textarea
+            id="chatArea"
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  handleChat();
+                }
+              }}
               onChange={(e) => setMessage(e.target.value)}
               className="w-full p-4 overflow-hidden h-32 text-primary text-2xl focus:outline-none resize-none rounded-3xl"
               placeholder="Ask what you want"
@@ -227,6 +240,7 @@ export const Home = () => {
               className="absolute left-6 bottom-6 text-primary cursor-pointer"
             />
             <Forward
+              id="sendQuery"
               onClick={handleChat}
               className="absolute right-6 bottom-6 text-primary cursor-pointer"
             />
